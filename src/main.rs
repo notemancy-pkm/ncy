@@ -35,12 +35,12 @@ fn main() {
                 process::exit(1);
             }
         }
+        // Default action when no subcommand is specified
         _ => {
-            println!("Please provide a valid command. Run 'ncy --help' for usage.");
-            process::exit(1);
+            if let Err(e) = commands::open::execute() {
+                eprintln!("Application error: {}", e);
+                process::exit(1);
+            }
         }
     }
 }
-
-/*
-*/
