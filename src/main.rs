@@ -9,6 +9,13 @@ fn main() {
         .version("0.1.0")
         .author("Your Name <your.email@example.com>")
         .about("A CLI PKM (Personal Knowledge Management) tool")
+        .arg(
+            Arg::with_name("external")
+                .short("e")
+                .long("external")
+                .help("Use fzf for picking notes instead of nucleo_picker (useful for integration with text editors)")
+                .takes_value(false),
+        )
         .subcommand(SubCommand::with_name("init").about("Initialize and configure ncy"))
         .subcommand(
             SubCommand::with_name("set")
@@ -58,7 +65,8 @@ fn main() {
         }
         // Default action when no subcommand is specified
         _ => {
-            if let Err(e) = commands::open::execute() {
+            let use_external = matches.is_present("external");
+            if let Err(e) = commands::open::execute_with_options(use_external) {
                 eprintln!("Application error: {}", e);
                 process::exit(1);
             }
