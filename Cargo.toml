@@ -1,0 +1,12 @@
+[package]
+name = "ncy"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+notemancy-core = { path = "../notemancy-core" }
+clap = "2.33"
+anyhow = "1.0"
+serde = "1.0"
+serde_json = "1.0"
+serde_yaml = "0.8"
