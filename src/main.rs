@@ -19,6 +19,17 @@ fn main() {
                         .required(true),
                 ),
         )
+        .subcommand(
+            SubCommand::with_name("new")
+                .visible_alias("n")
+                .about("Create a new note")
+                .arg(
+                    Arg::with_name("args")
+                        .help("Note title, project path, and vault in format: 'title @ project/path +vault'")
+                        .required(true)
+                        .multiple(true), // Allow multiple arguments to be combined into one string
+                ),
+        )
         .get_matches();
 
     match matches.subcommand() {
@@ -31,6 +42,16 @@ fn main() {
         ("set", Some(set_matches)) => {
             let vault_name = set_matches.value_of("vault").unwrap();
             if let Err(e) = commands::set::execute(vault_name) {
+                eprintln!("Application error: {}", e);
+                process::exit(1);
+            }
+        }
+        ("new", Some(new_matches)) | ("n", Some(new_matches)) => {
+            // Collect all arguments into a single string
+            let args: Vec<&str> = new_matches.values_of("args").unwrap().collect();
+            let combined_args = args.join(" ");
+
+            if let Err(e) = commands::new::execute(&combined_args) {
                 eprintln!("Application error: {}", e);
                 process::exit(1);
             }
