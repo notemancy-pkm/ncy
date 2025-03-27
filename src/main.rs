@@ -37,6 +37,17 @@ fn main() {
                         .multiple(true), // Allow multiple arguments to be combined into one string
                 ),
         )
+        .subcommand(
+            SubCommand::with_name("jrnl")
+                .visible_alias("j")
+                .about("Open or add to today's journal entry")
+                .arg(
+                    Arg::with_name("text")
+                        .help("Text to add to the journal entry (if not provided, opens today's entry)")
+                        .required(false)
+                        .multiple(true), // Allow multiple arguments to be combined into one string
+                ),
+        )
         .get_matches();
 
     match matches.subcommand() {
@@ -59,6 +70,20 @@ fn main() {
             let combined_args = args.join(" ");
 
             if let Err(e) = commands::new::execute(&combined_args) {
+                eprintln!("Application error: {}", e);
+                process::exit(1);
+            }
+        }
+        ("jrnl", Some(jrnl_matches)) | ("j", Some(jrnl_matches)) => {
+            // Check if any text was provided
+            let combined_args = if let Some(values) = jrnl_matches.values_of("text") {
+                let args: Vec<&str> = values.collect();
+                args.join(" ")
+            } else {
+                String::new() // Empty string if no text provided
+            };
+
+            if let Err(e) = commands::jrnl::execute(&combined_args) {
                 eprintln!("Application error: {}", e);
                 process::exit(1);
             }
