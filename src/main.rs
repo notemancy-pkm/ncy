@@ -62,6 +62,18 @@ fn main() {
                         .multiple(true), // Allow multiple arguments to be combined into one string
                 ),
         )
+        .subcommand(
+            SubCommand::with_name("dir")
+                .visible_alias("d")
+                .about("Select a note and open its directory in the file explorer")
+                .arg(
+                    Arg::with_name("external")
+                        .short("e")
+                        .long("external")
+                        .help("Print directory path to stdout rather than opening in file explorer")
+                        .takes_value(false),
+                ),
+        )
         .get_matches();
 
     match matches.subcommand() {
@@ -104,6 +116,15 @@ fn main() {
             };
 
             if let Err(e) = commands::jrnl::execute(&combined_args, external) {
+                eprintln!("Application error: {}", e);
+                process::exit(1);
+            }
+        }
+        ("dir", Some(dir_matches)) | ("d", Some(dir_matches)) => {
+            // Get the external flag
+            let use_external = dir_matches.is_present("external");
+
+            if let Err(e) = commands::dir::execute_with_options(use_external) {
                 eprintln!("Application error: {}", e);
                 process::exit(1);
             }

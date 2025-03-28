@@ -1,3 +1,4 @@
+pub mod dir;
 pub mod init;
 pub mod jrnl;
 pub mod new;
