@@ -114,6 +114,19 @@ pub fn execute() -> Result<()> {
                             journal_path.display()
                         );
                     }
+
+                    let workspaces_path = vault_path.join("workspaces");
+                    if !workspaces_path.exists() {
+                        fs::create_dir_all(&workspaces_path).context(format!(
+                            "Failed to create workspaces directory: {}",
+                            workspaces_path.display()
+                        ))?;
+                        println!(
+                            "Created workspaces directory for '{}': {}",
+                            vault_name,
+                            workspaces_path.display()
+                        );
+                    }
                 }
             }
         }
