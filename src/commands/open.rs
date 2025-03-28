@@ -115,11 +115,12 @@ fn select_note_with_fzf(
     }
     fs::write(&temp_file_path, &titles_str).context("Failed to write titles to temporary file")?;
 
-    // Set up fzf command with appropriate options
+    // Set up fzf command with full screen options
     let mut fzf_cmd = Command::new("fzf")
         .arg("--no-mouse")
-        .arg("--height=40%")
-        .arg("--layout=reverse")
+        // Remove the --height=40% option to use full screen
+        // Remove the --layout=reverse option (unless you prefer it)
+        // Keep the border for better visibility
         .arg("--border")
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
