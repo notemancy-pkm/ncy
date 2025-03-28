@@ -6,7 +6,12 @@ use std::env;
 use std::path::Path;
 use std::process::Command;
 
+// Original execute function now calls execute_with_options with external=false
 pub fn execute(args: &str) -> Result<()> {
+    execute_with_options(args, false)
+}
+
+pub fn execute_with_options(args: &str, external: bool) -> Result<()> {
     // Parse the arguments: "title @ project/path +vault"
     let (title, project, vault) = parse_arguments(args)?;
 
@@ -37,6 +42,17 @@ pub fn execute(args: &str) -> Result<()> {
         title, project
     ))?;
 
+    // If in external mode, just print the absolute path and return
+    if external {
+        // Convert to absolute path and print to stdout
+        let canonical_path = note_path
+            .canonicalize()
+            .context("Failed to get absolute path for created note")?;
+        println!("{}", canonical_path.display());
+        return Ok(());
+    }
+
+    // Normal mode - print message and open in editor
     println!("Created note: {} in {}", title, note_path.display());
 
     // Open the note in the default editor

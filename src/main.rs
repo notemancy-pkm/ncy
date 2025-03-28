@@ -31,6 +31,13 @@ fn main() {
                 .visible_alias("n")
                 .about("Create a new note")
                 .arg(
+                    Arg::with_name("external")
+                        .short("e")
+                        .long("external")
+                        .help("Create file and print absolute path to stdout (useful for integration with text editors)")
+                        .takes_value(false),
+                )
+                .arg(
                     Arg::with_name("args")
                         .help("Note title, project path, and vault in format: 'title @ project/path +vault'")
                         .required(true)
@@ -41,6 +48,13 @@ fn main() {
             SubCommand::with_name("jrnl")
                 .visible_alias("j")
                 .about("Open or add to today's journal entry")
+                .arg(
+                    Arg::with_name("external")
+                        .short("e")
+                        .long("external")
+                        .help("Print the absolute path of today's journal file instead of opening it")
+                        .takes_value(false),
+                )
                 .arg(
                     Arg::with_name("text")
                         .help("Text to add to the journal entry (if not provided, opens today's entry)")
@@ -69,12 +83,18 @@ fn main() {
             let args: Vec<&str> = new_matches.values_of("args").unwrap().collect();
             let combined_args = args.join(" ");
 
-            if let Err(e) = commands::new::execute(&combined_args) {
+            // Check if external flag is set
+            let use_external = new_matches.is_present("external");
+
+            if let Err(e) = commands::new::execute_with_options(&combined_args, use_external) {
                 eprintln!("Application error: {}", e);
                 process::exit(1);
             }
         }
         ("jrnl", Some(jrnl_matches)) | ("j", Some(jrnl_matches)) => {
+            // Get the external flag
+            let external = jrnl_matches.is_present("external");
+
             // Check if any text was provided
             let combined_args = if let Some(values) = jrnl_matches.values_of("text") {
                 let args: Vec<&str> = values.collect();
@@ -83,7 +103,7 @@ fn main() {
                 String::new() // Empty string if no text provided
             };
 
-            if let Err(e) = commands::jrnl::execute(&combined_args) {
+            if let Err(e) = commands::jrnl::execute(&combined_args, external) {
                 eprintln!("Application error: {}", e);
                 process::exit(1);
             }
